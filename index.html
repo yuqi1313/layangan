@@ -50,7 +50,7 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 <div class="topbar">&#x1FA81; Catatan Layangan</div>
 
 <div class="tabs">
-  <div class="tab on" onclick="showTab('jual',this)">&#x1F6D2; Terual</div>
+  <div class="tab on" onclick="showTab('jual',this)">&#x1F6D2; Jual</div>
   <div class="tab" onclick="showTab('stok',this)">&#x1F4E6; Stok</div>
   <div class="tab" onclick="showTab('tagihan',this)">&#x1F4B0; Tagihan</div>
 </div>
@@ -154,7 +154,7 @@ function renderJual() {
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <div class="stok-num">${l.stok}</div>
-          <button class="btn-jual" onclick="jualSatu(${l.id})" ${l.stok < 1 ? 'disabled' : ''}>&#x1F6D2; Jual</button>
+          <button class="btn-jual" onclick="jualSatu(${l.id})" ${l.stok < 1 ? 'disabled' : ''}>&#x1F6D2; Terjual</button>
         </div>
       </div>
     </div>`).join('');
