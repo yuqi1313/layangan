@@ -403,7 +403,14 @@ async function gantiPhoto(id) {
 
 function showTab(t, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  function showTab(t, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('on'));
+  $('pg-' + t).classList.add('on');
+  el.classList.add('on');
+  $('fab').style.display = t === 'stok' ? 'flex' : 'none';
+  if (t === 'tagihan') renderTagihan();
+}
   $('pg-' + t).classList.add('on');
   el.classList.add('on');
   $('fab').style.display = t === 'stok' ? 'flex' : 'none';
