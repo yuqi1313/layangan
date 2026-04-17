@@ -80,6 +80,9 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
     <div class="sum-item"><div class="val" id="t-lunas" style="color:#00b894">Rp 0</div><div class="lbl">Sudah Dibayar</div></div>
   </div>
   <button id="btn-bayar-semua" onclick="bayarSemua()" style="display:none;width:100%;padding:13px;font-size:15px;font-weight:700;background:linear-gradient(135deg,#00b894,#00cec9);color:white;border:none;border-radius:12px;margin-bottom:14px;cursor:pointer;box-shadow:0 3px 8px rgba(0,184,148,0.35)">&#x2705; Bayar Semua Tagihan</button>
+  <div id="toggle-lunas-wrap" style="display:none;text-align:right;margin-bottom:8px">
+    <span onclick="toggleLunas()" id="toggle-lunas-btn" style="font-size:13px;color:#00b894;font-weight:700;cursor:pointer">&#x1F4C2; Lihat Riwayat Lunas</span>
+  </div>
   <div id="list-tagihan"><div class="empty">Memuat...</div></div>
 </div>
 
@@ -214,6 +217,8 @@ async function jualSatu(id) {
   load();
 }
 
+let showLunas = false;
+
 async function renderTagihan() {
   const { data } = await sb.from('transaksis').select('*').order('created_at', { ascending: false });
   const semua = data || [];
@@ -222,17 +227,28 @@ async function renderTagihan() {
   $('t-total').innerText = rp(belum.reduce((a, b) => a + b.total, 0));
   $('t-lunas').innerText = rp(sudah.reduce((a, b) => a + b.total, 0));
   $('btn-bayar-semua').style.display = belum.length ? 'block' : 'none';
+  $('toggle-lunas-wrap').style.display = sudah.length ? 'block' : 'none';
+  $('toggle-lunas-btn').innerText = showLunas ? '🙈 Sembunyikan Riwayat' : '📂 Lihat Riwayat Lunas (' + sudah.length + ')';
+
   if (!semua.length) {
     $('list-tagihan').innerHTML = '<div class="empty">Belum ada transaksi.</div>';
     return;
   }
-  $('list-tagihan').innerHTML = semua.map(t => `
+
+  const tampil = showLunas ? semua : belum;
+  if (!tampil.length) {
+    $('list-tagihan').innerHTML = '<div class="empty">Semua tagihan sudah lunas. &#x1F389;</div>';
+    return;
+  }
+
+  $('list-tagihan').innerHTML = tampil.map(t => `
     <div class="hutang-card" style="border-left-color:${t.status == 'lunas' ? '#00b894' : '#d63031'}">
       <div class="row">
         <div>
           <div class="nama">${t.nama_pembeli || '-'}</div>
           <div class="sub">${t.layangan_nama} &times; ${t.qty} = ${rp(t.total)}</div>
           <div class="sub" style="font-size:11px;color:#bbb">${new Date(t.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          ${t.status == 'lunas' && t.paid_at ? `<div class="sub" style="font-size:11px;color:#00b894;margin-top:2px">&#x2714; Dibayar: ${new Date(t.paid_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>` : ''}
         </div>
         ${t.status == 'belum'
           ? `<button class="lunas-btn" onclick="tandaiLunas(${t.id})">Lunas</button>`
@@ -241,16 +257,21 @@ async function renderTagihan() {
     </div>`).join('');
 }
 
+function toggleLunas() {
+  showLunas = !showLunas;
+  renderTagihan();
+}
+
 async function bayarSemua() {
   const total = $('t-total').innerText;
   if (!confirm('Tandai semua tagihan (' + total + ') sebagai lunas?')) return;
-  await sb.from('transaksis').update({ status: 'lunas' }).eq('status', 'belum');
+  await sb.from('transaksis').update({ status: 'lunas', paid_at: new Date().toISOString() }).eq('status', 'belum');
   toast('✅ Semua tagihan lunas!');
   load();
 }
 
 async function tandaiLunas(id) {
-  await sb.from('transaksis').update({ status: 'lunas' }).eq('id', id);
+  await sb.from('transaksis').update({ status: 'lunas', paid_at: new Date().toISOString() }).eq('id', id);
   toast('✅ Ditandai lunas!');
   load();
 }
