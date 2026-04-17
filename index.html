@@ -66,8 +66,7 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
     <select id="j-item"></select>
     <label>Jumlah</label>
     <input type="number" id="j-qty" value="1" min="1">
-    <label>Nama (opsional)</label>
-    <input type="text" id="j-nama" placeholder="Nama pembeli / catatan">
+
     <div class="total-box" id="j-total-box">
       <div style="font-size:13px;color:#888">Total tagihan ke teman</div>
       <div class="big" id="j-total">Rp 0</div>
@@ -166,7 +165,7 @@ async function simpanJual() {
   const sel = $('j-item');
   const id = sel.value;
   const qty = parseInt($('j-qty').value);
-  const nama = $('j-nama').value || '-';
+  const nama = '-';
   const l = items.find(x=>x.id==id);
   if(!id||!qty||!l){ toast('Pilih layangan & isi jumlah!'); return; }
   if(l.stok < qty){ toast('Stok tidak cukup! Stok: '+l.stok); return; }
@@ -174,7 +173,7 @@ async function simpanJual() {
   await sb.from('transaksis').insert({layangan_id:id, layangan_nama:l.nama, qty, harga:l.harga, total, nama_pembeli:nama, status:'belum'});
   await sb.from('layangans').update({stok: l.stok - qty}).eq('id', id);
   toast('✅ Tersimpan! Tagihan: '+rp(total));
-  $('j-qty').value=1; $('j-nama').value=''; sel.value=''; $('j-total').innerText='Rp 0';
+  $('j-qty').value=1; sel.value=''; $('j-total').innerText='Rp 0';
   load();
 }
 
