@@ -25,8 +25,9 @@ button { border: none; border-radius: 8px; padding: 10px 16px; font-weight: 700;
 .btn-gray { background: #eee; color: #333; }
 input, select { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 6px; }
 label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-top: 12px; }
-.btn-minus { width: 44px; height: 44px; border-radius: 50%; background: #d63031; color: white; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; flex-shrink: 0; }
-.btn-minus:active { background: #a00; }
+.btn-jual { background: linear-gradient(135deg, #e65c00, #f9a825); color: white; border: none; border-radius: 24px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(230,92,0,0.35); transition: transform 0.1s, box-shadow 0.1s; flex-shrink: 0; }
+.btn-jual:active { transform: scale(0.93); box-shadow: 0 1px 4px rgba(230,92,0,0.2); }
+.btn-jual:disabled { background: #ddd; color: #aaa; box-shadow: none; cursor: not-allowed; }
 .hutang-card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 4px solid #d63031; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .lunas-btn { background: #00b894; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; }
 .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
@@ -153,7 +154,7 @@ function renderJual() {
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <div class="stok-num">${l.stok}</div>
-          <button class="btn-minus" onclick="jualSatu(${l.id})" ${l.stok < 1 ? 'disabled style="background:#ccc;cursor:not-allowed"' : ''}>&#x2212;</button>
+          <button class="btn-jual" onclick="jualSatu(${l.id})" ${l.stok < 1 ? 'disabled' : ''}>&#x1F6D2; Jual</button>
         </div>
       </div>
     </div>`).join('');
