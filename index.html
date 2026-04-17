@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Layangan</title>
+<title>Catatan Layangan</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#e65c00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Layangan">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
@@ -43,6 +48,12 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 .sum-item .val { font-size: 17px; font-weight: 900; }
 .sum-item .lbl { font-size: 11px; color: #888; margin-top: 2px; }
 .stok-form { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.install-banner { display:none; position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:white; border-top:3px solid #e65c00; padding:14px 20px; z-index:50; box-shadow:0 -4px 16px rgba(0,0,0,0.12); align-items:center; gap:12px; }
+.install-banner.on { display:flex; }
+.install-banner .ib-text { flex:1; font-size:13px; color:#333; }
+.install-banner .ib-text b { display:block; font-size:14px; margin-bottom:2px; }
+.install-banner .ib-btn { background:#e65c00; color:white; border:none; border-radius:10px; padding:10px 16px; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap; }
+.install-banner .ib-close { background:none; border:none; font-size:20px; color:#aaa; cursor:pointer; padding:4px; }
 </style>
 </head>
 <body>
@@ -104,6 +115,16 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
       <button class="btn-o" style="flex:1" onclick="tambahLayangan()">Simpan</button>
     </div>
   </div>
+</div>
+
+<div class="install-banner" id="install-banner">
+  <div style="font-size:28px">&#x1FA81;</div>
+  <div class="ib-text">
+    <b>Pasang ke Layar Utama</b>
+    Buka seperti aplikasi, tanpa browser
+  </div>
+  <button class="ib-btn" id="install-btn">Pasang</button>
+  <button class="ib-close" onclick="tutupBanner()">&#x2715;</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -315,6 +336,34 @@ function showTab(t, el) {
 
 function openSheet() { $('overlay').classList.add('on'); }
 function closeSheet() { $('overlay').classList.remove('on'); }
+
+// PWA
+let deferredPrompt = null;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/layangan/sw.js');
+}
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('install-dismissed')) {
+    $('install-banner').classList.add('on');
+  }
+});
+$('install-btn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  $('install-banner').classList.remove('on');
+  if (outcome === 'accepted') toast('✅ Aplikasi dipasang!');
+});
+window.addEventListener('appinstalled', () => {
+  $('install-banner').classList.remove('on');
+});
+function tutupBanner() {
+  $('install-banner').classList.remove('on');
+  localStorage.setItem('install-dismissed', '1');
+}
 </script>
 </body>
 </html>
