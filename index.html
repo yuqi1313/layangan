@@ -79,6 +79,7 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
     <div class="sum-item"><div class="val" id="t-total" style="color:#d63031">Rp 0</div><div class="lbl">Belum Dibayar</div></div>
     <div class="sum-item"><div class="val" id="t-lunas" style="color:#00b894">Rp 0</div><div class="lbl">Sudah Dibayar</div></div>
   </div>
+  <button id="btn-bayar-semua" onclick="bayarSemua()" style="display:none;width:100%;padding:13px;font-size:15px;font-weight:700;background:linear-gradient(135deg,#00b894,#00cec9);color:white;border:none;border-radius:12px;margin-bottom:14px;cursor:pointer;box-shadow:0 3px 8px rgba(0,184,148,0.35)">&#x2705; Bayar Semua Tagihan</button>
   <div id="list-tagihan"><div class="empty">Memuat...</div></div>
 </div>
 
@@ -170,11 +171,16 @@ function renderStokList() {
     items.map(l => `
     <div class="card" style="padding:12px 16px">
       <div class="row">
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="nama">${l.nama}</div>
-          <div class="sub">${rp(l.harga)} / buah</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+            <span style="font-size:12px;color:#888">Rp</span>
+            <input type="number" id="harga-${l.id}" value="${l.harga}" min="0"
+              style="width:110px;padding:6px 8px;font-size:14px;font-weight:700;margin-top:0;border-radius:8px">
+            <button onclick="simpanHarga(${l.id})" style="background:#e65c00;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Simpan</button>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-left:10px">
           <div class="stok-num">${l.stok}</div>
           <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:8px 10px;font-size:13px">&#x1F5D1;</button>
         </div>
@@ -215,6 +221,7 @@ async function renderTagihan() {
   const sudah = semua.filter(x => x.status == 'lunas');
   $('t-total').innerText = rp(belum.reduce((a, b) => a + b.total, 0));
   $('t-lunas').innerText = rp(sudah.reduce((a, b) => a + b.total, 0));
+  $('btn-bayar-semua').style.display = belum.length ? 'block' : 'none';
   if (!semua.length) {
     $('list-tagihan').innerHTML = '<div class="empty">Belum ada transaksi.</div>';
     return;
@@ -234,9 +241,25 @@ async function renderTagihan() {
     </div>`).join('');
 }
 
+async function bayarSemua() {
+  const total = $('t-total').innerText;
+  if (!confirm('Tandai semua tagihan (' + total + ') sebagai lunas?')) return;
+  await sb.from('transaksis').update({ status: 'lunas' }).eq('status', 'belum');
+  toast('✅ Semua tagihan lunas!');
+  load();
+}
+
 async function tandaiLunas(id) {
   await sb.from('transaksis').update({ status: 'lunas' }).eq('id', id);
   toast('✅ Ditandai lunas!');
+  load();
+}
+
+async function simpanHarga(id) {
+  const val = parseInt(document.getElementById('harga-' + id).value);
+  if (isNaN(val) || val < 0) { toast('Harga tidak valid!'); return; }
+  await sb.from('layangans').update({ harga: val }).eq('id', id);
+  toast('✅ Harga diperbarui!');
   load();
 }
 
