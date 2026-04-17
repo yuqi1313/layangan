@@ -110,6 +110,15 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
     <input type="number" id="s-harga" placeholder="25000">
     <label>Stok Awal</label>
     <input type="number" id="s-stok" placeholder="0" value="0">
+    <label>Foto Layangan (opsional)</label>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:12px">
+      <div id="s-foto-preview" onclick="document.getElementById('s-foto-input').click()"
+        style="width:64px;height:64px;border-radius:10px;background:#f5e6d3;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px dashed #e65c00;cursor:pointer;flex-shrink:0;overflow:hidden">
+        &#x1F4F7;
+      </div>
+      <span style="font-size:13px;color:#888">Tap untuk pilih foto dari HP</span>
+    </div>
+    <input type="file" id="s-foto-input" accept="image/*" style="display:none">
     <div class="btn-row">
       <button class="btn-gray" style="flex:1" onclick="closeSheet()">Batal</button>
       <button class="btn-o" style="flex:1" onclick="tambahLayangan()">Simpan</button>
@@ -133,6 +142,7 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 const SURL = "https://xjqkaykrlqtvrbjxgzxm.supabase.co";
 const SKEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqcWtheWtybHF0dnJianhnenhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzg3OTUsImV4cCI6MjA5MTk1NDc5NX0.poSeoWokR5BW7Y_0gmUYEahZ3Cs4Kri_-J5WP1vrT4I";
 let sb, items = [];
+let uploadedPhotoUrl = null;
 const $ = id => document.getElementById(id);
 const rp = n => "Rp " + Number(n).toLocaleString('id-ID');
 
@@ -173,9 +183,14 @@ function renderJual() {
   $('list-jual').innerHTML = items.map(l => `
     <div class="card">
       <div class="row">
-        <div>
-          <div class="nama">${l.nama}</div>
-          <div class="sub">${rp(l.harga)} / buah</div>
+        <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+          ${l.foto_url
+            ? `<img src="${l.foto_url}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0">`
+            : `<div style="width:48px;height:48px;border-radius:10px;background:#f5e6d3;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">&#x1FA81;</div>`}
+          <div>
+            <div class="nama">${l.nama}</div>
+            <div class="sub">${rp(l.harga)} / buah</div>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <div class="stok-num">${l.stok}</div>
@@ -194,7 +209,13 @@ function renderStokList() {
   $('list-stok').innerHTML = '<div style="font-size:12px;color:#aaa;margin-bottom:8px;font-weight:700">STOK SAAT INI</div>' +
     items.map(l => `
     <div class="card" style="padding:12px 16px">
-      <div class="row">
+      <div class="row" style="align-items:flex-start;gap:10px">
+        <div style="cursor:pointer;flex-shrink:0" onclick="gantiPhoto(${l.id})" title="Tap untuk ganti foto">
+          ${l.foto_url
+            ? `<img src="${l.foto_url}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid #e65c00">`
+            : `<div style="width:52px;height:52px;border-radius:10px;background:#f5e6d3;display:flex;align-items:center;justify-content:center;font-size:26px;border:2px dashed #e65c00">&#x1FA81;</div>`}
+          <div style="font-size:10px;color:#e65c00;text-align:center;margin-top:3px;font-weight:700">Ganti</div>
+        </div>
         <div style="flex:1;min-width:0">
           <div class="nama">${l.nama}</div>
           <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
@@ -204,7 +225,7 @@ function renderStokList() {
             <button onclick="simpanHarga(${l.id})" style="background:#e65c00;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Simpan</button>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;margin-left:10px">
+        <div style="display:flex;align-items:center;gap:10px">
           <div class="stok-num">${l.stok}</div>
           <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:8px 10px;font-size:13px">&#x1F5D1;</button>
         </div>
@@ -316,13 +337,52 @@ async function tambahLayangan() {
   const harga = parseInt($('s-harga').value);
   const stok = parseInt($('s-stok').value) || 0;
   if (!nama || !harga) { toast('Isi nama & harga!'); return; }
-  await sb.from('layangans').insert({ nama, harga, stok });
+
+  // Upload foto jika ada
+  let foto_url = null;
+  const file = $('s-foto-input').files[0];
+  if (file) {
+    toast('⏳ Mengupload foto...');
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from('layangan-photos').upload(path, file, { upsert: true });
+    if (!error) {
+      const { data } = sb.storage.from('layangan-photos').getPublicUrl(path);
+      foto_url = data.publicUrl;
+    }
+  }
+
+  await sb.from('layangans').insert({ nama, harga, stok, foto_url });
   toast('✅ Layangan ditambah!');
   closeSheet();
   $('s-nama').value = '';
   $('s-harga').value = '';
   $('s-stok').value = '0';
+  $('s-foto-input').value = '';
+  $('s-foto-preview').innerHTML = '&#x1F4F7;';
+  $('s-foto-preview').style.fontSize = '28px';
   load();
+}
+
+async function gantiPhoto(id) {
+  // Buat input file sementara
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    toast('⏳ Mengupload foto...');
+    const ext = file.name.split('.').pop();
+    const path = `${id}_${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from('layangan-photos').upload(path, file, { upsert: true });
+    if (error) { toast('❌ Gagal upload!'); return; }
+    const { data } = sb.storage.from('layangan-photos').getPublicUrl(path);
+    await sb.from('layangans').update({ foto_url: data.publicUrl }).eq('id', id);
+    toast('✅ Foto diperbarui!');
+    load();
+  };
+  input.click();
 }
 
 function showTab(t, el) {
@@ -336,6 +396,17 @@ function showTab(t, el) {
 
 function openSheet() { $('overlay').classList.add('on'); }
 function closeSheet() { $('overlay').classList.remove('on'); }
+
+$('s-foto-input').addEventListener('change', () => {
+  const file = $('s-foto-input').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    $('s-foto-preview').innerHTML = `<img src="${e.target.result}" style="width:64px;height:64px;object-fit:cover">`;
+    $('s-foto-preview').style.fontSize = '0';
+  };
+  reader.readAsDataURL(file);
+});
 
 // PWA
 let deferredPrompt = null;
