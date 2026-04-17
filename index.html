@@ -15,33 +15,33 @@ body { background: #f0f0f0; max-width: 480px; margin: 0 auto; min-height: 100vh;
 .page { display: none; padding: 16px; }
 .page.on { display: block; }
 .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-.row { display: flex; justify-content: space-between; align-items: center; }
 .nama { font-weight: 700; font-size: 15px; }
 .sub { color: #888; font-size: 13px; margin-top: 2px; }
-.stok-num { font-size: 22px; font-weight: 900; color: #e65c00; }
-.btn-row { display: flex; gap: 8px; margin-top: 10px; }
+.stok-num { font-size: 22px; font-weight: 900; color: #e65c00; min-width: 36px; text-align: right; }
+.row { display: flex; justify-content: space-between; align-items: center; }
 button { border: none; border-radius: 8px; padding: 10px 16px; font-weight: 700; cursor: pointer; font-size: 14px; }
-.btn-o { background: #e65c00; color: white; flex: 1; }
-.btn-g { background: #00b894; color: white; flex: 1; }
+.btn-o { background: #e65c00; color: white; }
 .btn-r { background: #d63031; color: white; }
-.btn-gray { background: #eee; color: #333; flex: 1; }
+.btn-gray { background: #eee; color: #333; }
 input, select { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 6px; }
 label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-top: 12px; }
-.total-box { background: #fff3e0; border-radius: 10px; padding: 14px; text-align: center; margin: 12px 0; }
-.total-box .big { font-size: 24px; font-weight: 900; color: #e65c00; }
+.btn-minus { width: 44px; height: 44px; border-radius: 50%; background: #d63031; color: white; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; flex-shrink: 0; }
+.btn-minus:active { background: #a00; }
 .hutang-card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 4px solid #d63031; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.lunas-btn { background: #00b894; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.lunas-btn { background: #00b894; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; }
 .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
 .fab { position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px; background: #e65c00; color: white; border-radius: 50%; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(230,92,0,0.4); cursor: pointer; border: none; }
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10; align-items: flex-end; }
 .overlay.on { display: flex; }
 .sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 24px 20px 32px; }
 .sheet h3 { font-size: 17px; margin-bottom: 4px; }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
 .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 22px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 99; }
 .sum-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .sum-item { background: white; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .sum-item .val { font-size: 17px; font-weight: 900; }
 .sum-item .lbl { font-size: 11px; color: #888; margin-top: 2px; }
+.stok-form { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 </style>
 </head>
 <body>
@@ -49,31 +49,27 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 <div class="topbar">&#x1FA81; Catatan Layangan</div>
 
 <div class="tabs">
-  <div class="tab on" onclick="showTab('stok',this)">&#x1F4E6; Stok</div>
-  <div class="tab" onclick="showTab('jual',this)">&#x1F6D2; Jual</div>
+  <div class="tab on" onclick="showTab('jual',this)">&#x1F6D2; Jual</div>
+  <div class="tab" onclick="showTab('stok',this)">&#x1F4E6; Stok</div>
   <div class="tab" onclick="showTab('tagihan',this)">&#x1F4B0; Tagihan</div>
 </div>
 
-<!-- STOK -->
-<div id="pg-stok" class="page on">
-  <div id="list-stok"><div class="empty">Memuat...</div></div>
+<!-- JUAL -->
+<div id="pg-jual" class="page on">
+  <div id="list-jual"><div class="empty">Memuat...</div></div>
 </div>
 
-<!-- JUAL -->
-<div id="pg-jual" class="page">
-  <div class="card">
+<!-- STOK -->
+<div id="pg-stok" class="page">
+  <div class="stok-form">
+    <h3 style="font-size:15px;margin-bottom:4px">&#x2795; Tambah Stok</h3>
     <label>Pilih Layangan</label>
-    <select id="j-item"></select>
-    <label>Jumlah</label>
-    <input type="number" id="j-qty" value="1" min="1">
-    <label>Nama Pembeli</label>
-    <input type="text" id="j-nama" placeholder="Contoh: Budi (opsional)">
-    <div class="total-box" id="j-total-box">
-      <div style="font-size:13px;color:#888">Total tagihan</div>
-      <div class="big" id="j-total">Rp 0</div>
-    </div>
-    <button class="btn-o" style="width:100%;padding:14px;font-size:16px" onclick="simpanJual()">&#x1F4BE; Simpan</button>
+    <select id="ts-item"></select>
+    <label>Jumlah Tambah</label>
+    <input type="number" id="ts-qty" value="1" min="1">
+    <button class="btn-o" style="width:100%;margin-top:14px;padding:13px;font-size:15px" onclick="tambahStok()">&#x2705; Tambah Stok</button>
   </div>
+  <div id="list-stok"><div class="empty">Memuat...</div></div>
 </div>
 
 <!-- TAGIHAN -->
@@ -85,22 +81,22 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
   <div id="list-tagihan"><div class="empty">Memuat...</div></div>
 </div>
 
-<!-- FAB tambah layangan -->
-<button class="fab" id="fab" onclick="openSheet()">+</button>
+<!-- FAB tambah jenis layangan baru -->
+<button class="fab" id="fab" style="display:none" onclick="openSheet()">+</button>
 
-<!-- Sheet tambah layangan -->
+<!-- Sheet tambah jenis layangan baru -->
 <div class="overlay" id="overlay" onclick="closeSheet()">
   <div class="sheet" onclick="event.stopPropagation()">
-    <h3>&#x2795; Tambah Layangan</h3>
+    <h3>&#x2795; Tambah Jenis Layangan</h3>
     <label>Nama Layangan</label>
     <input type="text" id="s-nama" placeholder="Contoh: Layangan Naga">
-    <label>Harga Modal (Rp)</label>
+    <label>Harga Jual (Rp)</label>
     <input type="number" id="s-harga" placeholder="25000">
     <label>Stok Awal</label>
     <input type="number" id="s-stok" placeholder="0" value="0">
-    <div class="btn-row" style="margin-top:16px">
-      <button class="btn-gray" onclick="closeSheet()">Batal</button>
-      <button class="btn-o" onclick="tambahLayangan()">Simpan</button>
+    <div class="btn-row">
+      <button class="btn-gray" style="flex:1" onclick="closeSheet()">Batal</button>
+      <button class="btn-o" style="flex:1" onclick="tambahLayangan()">Simpan</button>
     </div>
   </div>
 </div>
@@ -136,63 +132,78 @@ window.onload = () => {
 async function load() {
   const { data } = await sb.from('layangans').select('*').order('nama');
   items = data || [];
-  renderStok();
-  renderJualDrop();
+  renderJual();
+  renderStokList();
+  renderStokDrop();
   await renderTagihan();
 }
 
-function renderStok() {
+// TAB JUAL — tiap layangan ada tombol − untuk jual 1
+function renderJual() {
   if (!items.length) {
-    $('list-stok').innerHTML = '<div class="empty">Belum ada layangan.<br>Tap + untuk tambah.</div>';
+    $('list-jual').innerHTML = '<div class="empty">Belum ada layangan.</div>';
     return;
   }
-  $('list-stok').innerHTML = items.map(l => `
+  $('list-jual').innerHTML = items.map(l => `
     <div class="card">
       <div class="row">
-        <div><div class="nama">${l.nama}</div><div class="sub">${rp(l.harga)} / buah</div></div>
-        <div class="stok-num">${l.stok}</div>
-      </div>
-      <div class="btn-row" style="margin-top:10px;align-items:center">
-        <button onclick="ubahQty(${l.id},-1)" style="background:#eee;color:#333;padding:10px 14px;font-size:18px;flex:none">&#x2212;</button>
-        <input type="number" id="qty-jual-${l.id}" value="1" min="1" max="${l.stok}"
-          style="width:60px;text-align:center;font-weight:900;font-size:16px;padding:8px;margin-top:0;flex:none">
-        <button onclick="ubahQty(${l.id},1)" style="background:#eee;color:#333;padding:10px 14px;font-size:18px;flex:none">&#x2B;</button>
-        <button class="btn-r" style="background:#e67e22;flex:1" onclick="jualDariStok(${l.id})">&#x1F6D2; Jual</button>
-        <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:10px 12px;flex:none">&#x1F5D1;</button>
+        <div>
+          <div class="nama">${l.nama}</div>
+          <div class="sub">${rp(l.harga)} / buah</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="stok-num">${l.stok}</div>
+          <button class="btn-minus" onclick="jualSatu(${l.id})" ${l.stok < 1 ? 'disabled style="background:#ccc;cursor:not-allowed"' : ''}>&#x2212;</button>
+        </div>
       </div>
     </div>`).join('');
 }
 
-function renderJualDrop() {
-  $('j-item').innerHTML = '<option value="">-- Pilih --</option>' +
-    items.map(l => `<option value="${l.id}" data-harga="${l.harga}">${l.nama} (${rp(l.harga)})</option>`).join('');
-  $('j-item').onchange = hitungTotal;
-  $('j-qty').oninput = hitungTotal;
+// TAB STOK — daftar stok saat ini + tombol hapus
+function renderStokList() {
+  if (!items.length) {
+    $('list-stok').innerHTML = '<div class="empty">Belum ada layangan.<br>Tap + untuk tambah jenis baru.</div>';
+    return;
+  }
+  $('list-stok').innerHTML = '<div style="font-size:12px;color:#aaa;margin-bottom:8px;font-weight:700">STOK SAAT INI</div>' +
+    items.map(l => `
+    <div class="card" style="padding:12px 16px">
+      <div class="row">
+        <div>
+          <div class="nama">${l.nama}</div>
+          <div class="sub">${rp(l.harga)} / buah</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="stok-num">${l.stok}</div>
+          <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:8px 10px;font-size:13px">&#x1F5D1;</button>
+        </div>
+      </div>
+    </div>`).join('');
 }
 
-function hitungTotal() {
-  const opt = $('j-item').selectedOptions[0];
-  const harga = opt ? parseInt(opt.dataset.harga) || 0 : 0;
-  const qty = parseInt($('j-qty').value) || 0;
-  $('j-total').innerText = rp(harga * qty);
+function renderStokDrop() {
+  $('ts-item').innerHTML = items.map(l =>
+    `<option value="${l.id}">${l.nama} (stok: ${l.stok})</option>`
+  ).join('');
 }
 
-async function simpanJual() {
-  const sel = $('j-item');
-  const id = sel.value;
-  const qty = parseInt($('j-qty').value);
-  const nama = $('j-nama').value.trim() || '-';
+async function tambahStok() {
+  const id = $('ts-item').value;
+  const qty = parseInt($('ts-qty').value);
   const l = items.find(x => x.id == id);
-  if (!id || !qty || !l) { toast('Pilih layangan & isi jumlah!'); return; }
-  if (l.stok < qty) { toast('Stok tidak cukup! Stok: ' + l.stok); return; }
-  const total = qty * l.harga;
-  await sb.from('transaksis').insert({ layangan_id: id, layangan_nama: l.nama, qty, harga: l.harga, total, nama_pembeli: nama, status: 'belum' });
-  await sb.from('layangans').update({ stok: l.stok - qty }).eq('id', id);
-  toast('&#x2705; Tersimpan! Tagihan: ' + rp(total));
-  $('j-qty').value = 1;
-  $('j-nama').value = '';
-  sel.value = '';
-  $('j-total').innerText = 'Rp 0';
+  if (!id || !qty || qty < 1 || !l) { toast('Pilih layangan & isi jumlah!'); return; }
+  await sb.from('layangans').update({ stok: l.stok + qty }).eq('id', id);
+  toast('✅ Stok ' + l.nama + ' +' + qty);
+  $('ts-qty').value = 1;
+  load();
+}
+
+async function jualSatu(id) {
+  const l = items.find(x => x.id === id);
+  if (!l || l.stok < 1) { toast('Stok habis!'); return; }
+  await sb.from('transaksis').insert({ layangan_id: id, layangan_nama: l.nama, qty: 1, harga: l.harga, total: l.harga, nama_pembeli: '-', status: 'belum' });
+  await sb.from('layangans').update({ stok: l.stok - 1 }).eq('id', id);
+  toast('🛒 Terjual 1 ' + l.nama + ' — ' + rp(l.harga));
   load();
 }
 
@@ -224,26 +235,7 @@ async function renderTagihan() {
 
 async function tandaiLunas(id) {
   await sb.from('transaksis').update({ status: 'lunas' }).eq('id', id);
-  toast('&#x2705; Ditandai lunas!');
-  load();
-}
-
-function ubahQty(id, delta) {
-  const input = document.getElementById('qty-jual-' + id);
-  const l = items.find(x => x.id === id);
-  let val = parseInt(input.value) || 1;
-  val = Math.max(1, Math.min(l.stok, val + delta));
-  input.value = val;
-}
-
-async function jualDariStok(id) {
-  const l = items.find(x => x.id === id);
-  const qty = parseInt(document.getElementById('qty-jual-' + id).value) || 1;
-  if (l.stok < qty) { toast('Stok tidak cukup! Stok: ' + l.stok); return; }
-  const total = l.harga * qty;
-  await sb.from('transaksis').insert({ layangan_id: id, layangan_nama: l.nama, qty, harga: l.harga, total, nama_pembeli: '-', status: 'belum' });
-  await sb.from('layangans').update({ stok: l.stok - qty }).eq('id', id);
-  toast('&#x2705; Terjual ' + qty + '! Tagihan: ' + rp(total));
+  toast('✅ Ditandai lunas!');
   load();
 }
 
@@ -259,7 +251,7 @@ async function tambahLayangan() {
   const stok = parseInt($('s-stok').value) || 0;
   if (!nama || !harga) { toast('Isi nama & harga!'); return; }
   await sb.from('layangans').insert({ nama, harga, stok });
-  toast('&#x2705; Layangan ditambah!');
+  toast('✅ Layangan ditambah!');
   closeSheet();
   $('s-nama').value = '';
   $('s-harga').value = '';
