@@ -409,16 +409,6 @@ function showTab(t, el) {
   $('fab').style.display = t === 'stok' ? 'flex' : 'none';
   if (t === 'tagihan') renderTagihan();
 }
-  $('pg-' + t).classList.add('on');
-  el.classList.add('on');
-  $('fab').style.display = t === 'stok' ? 'flex' : 'none';
-  if (t === 'tagihan') renderTagihan();
-}
-  $('pg-' + t).classList.add('on');
-  el.classList.add('on');
-  $('fab').style.display = t === 'stok' ? 'flex' : 'none';
-  if (t === 'tagihan') renderTagihan();
-}
 
 function openSheet() { $('overlay').classList.add('on'); }
 function closeSheet() { $('overlay').classList.remove('on'); }
