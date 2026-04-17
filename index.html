@@ -1,11 +1,248 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Catat Layangan</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');:root {--primary: #FF6B35;--primary-light: #FF8C5E;--primary-dark: #CC4A1A;--bg: #FFF8F5;--surface: #FFFFFF;--text: #1A1A2E;--text2: #6B6B7B;--border: rgba(255, 107, 53, 0.15);--green: #06D6A0;--green-bg: #E8FBF6;--red: #EF476F;--red-bg: #FEE8EE;--shadow: 0 4px 20px rgba(255, 107, 53, 0.12);}* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }body {font-family: 'Nunito', sans-serif;background: var(--bg);color: var(--text);min-height: 100vh;padding-bottom: 80px;max-width: 500px;margin: 0 auto;position: relative;}#setup-screen {position: fixed;top: 0;left: 50%;transform: translateX(-50%);width: 100%;max-width: 500px;height: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center;padding: 20px;background: linear-gradient(160deg, #FF6B35 0%, #FFD166 100%);z-index: 9999;}.setup-card { background: white; border-radius: 20px; padding: 25px; width: 90%; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }.setup-card input { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 10px; }.header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); padding: 20px; color: white; position: sticky; top: 0; z-index: 100; border-radius: 0 0 20px 20px; }.h1 { font-size: 22px; font-weight: 900; }.summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px 20px; }.sum-card { background: white; padding: 15px; border-radius: 15px; box-shadow: var(--shadow); border: 1px solid var(--border); }.sum-card small { font-size: 11px; color: var(--text2); font-weight: 700; text-transform: uppercase; }.sum-card div { font-size: 18px; font-weight: 900; }.section { display: none; padding: 10px 20px; }.section.active { display: block; }.section-title { font-size: 17px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }.card { background: white; border-radius: 18px; padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow); border: 1px solid var(--border); }.form-group { margin-bottom: 12px; }.form-group label { font-size: 12px; font-weight: 700; color: var(--text2); display: block; margin-bottom: 5px; }.form-group input, .form-group select { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; outline: none; }.btn-primary { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; }.item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }.stok-controls { display: flex; align-items: center; gap: 12px; }.btn-s { width: 32px; height: 32px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; }.btn-plus { background: var(--green-bg); color: var(--green); }.btn-minus { background: var(--red-bg); color: var(--red); }.hutang-box { background: var(--red-bg); border: 1px solid var(--red); padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }.btn-lunas { background: var(--green); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; }.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: white; display: flex; border-top: 1px solid #eee; z-index: 500; }.nav-item { flex: 1; padding: 15px 0; text-align: center; color: var(--text2); font-size: 11px; font-weight: 700; cursor: pointer; }.nav-item.active { color: var(--primary); }.fab { position: fixed; bottom: 85px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border: none; border-radius: 18px; font-size: 24px; box-shadow: 0 5px 15px rgba(255,107,53,0.4); display: none; align-items: center; justify-content: center; z-index: 400; }.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; z-index: 1000; }.modal-bg.open { display: flex; }.modal { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; animation: slide 0.3s ease; }@keyframes slide { from { transform: translateY(100%); } to { transform: translateY(0); } }.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; z-index: 2000; display: none; }</style></head><body><div id="setup-screen" style="display:none"></div><div id="app"><div class="header"><div class="h1">🪁 Catat Layangan</div><div id="h-date" style="font-size: 12px; opacity: 0.8;"></div></div><div class="summary"><div class="sum-card"><small>⏳ Hutang</small><div id="sum-h" style="color:var(--red)">Rp 0</div></div><div class="sum-card"><small>📦 Stok</small><div id="sum-s" style="color:var(--primary)">0</div></div></div><div id="s-stok" class="section active"><div class="section-title">📦 Daftar Stok</div><div id="list-stok"></div></div><div id="s-jual" class="section"><div class="section-title">🛒 Input Jual</div><div class="card"><div class="form-group"><label>Barang</label><select id="j-id"></select></div><div class="form-group"><label>Qty</label><input type="number" id="j-qty" value="1" min="1"></div><div class="form-group"><label>Nama Pembeli</label><input type="text" id="j-note" placeholder="Misal: Budi"></div><button class="btn-primary" onclick="doJual()">💾 Simpan</button></div><div class="section-title">🚩 Belum Bayar</div><div id="list-hutang"></div></div><div id="s-riwayat" class="section"><div class="section-title">📋 Riwayat</div><div id="list-history"></div></div><div id="s-laporan" class="section"><div class="section-title">📊 Laporan</div><div id="laporan-box"></div></div><nav class="nav"><div class="nav-item active" onclick="tab('stok', this)">📦 Stok</div><div class="nav-item" onclick="tab('jual', this)">🛒 Jual</div><div class="nav-item" onclick="tab('riwayat', this)">📋 Riwayat</div><div class="nav-item" onclick="tab('laporan', this)">📊 Laporan</div></nav></div><button id="fab" class="fab" onclick="openM()">+</button><div id="m-add" class="modal-bg"><div class="modal"><h3>Tambah Layangan</h3><br><div class="form-group"><label>Nama</label><input type="text" id="in-nama"></div><div class="form-group"><label>Harga Pokok</label><input type="number" id="in-harga"></div><div class="form-group"><label>Stok</label><input type="number" id="in-stok"></div><button class="btn-primary" onclick="addLayangan()">Simpan</button><button onclick="closeM()" style="width:100%; background:none; border:none; padding:15px; color:#666; font-weight:bold;">Batal</button></div></div><div id="tst" class="toast"></div><script>const URL = "https://xjqkaykrlqtvrbjxgzxm.supabase.co";const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqcWtheWtybHF0dnJianhnenhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzg3OTUsImV4cCI6MjA5MTk1NDc5NX0.poSeoWokR5BW7Y_0gmUYEahZ3Cs4Kri_-J5WP1vrT4I";let sb = null;let dataL = [];const id = (x) => document.getElementById(x);const rp = (n) => "Rp " + Math.round(n).toLocaleString('id-ID');window.onload = () => {
-  const tryInit = () => {
-    if(window.supabase) {
-      sb = window.supabase.createClient(URL, KEY);
-      start();
-    } else {
-      setTimeout(tryInit, 100);
-    }
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layangan</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+body { background: #f0f0f0; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+.topbar { background: #e65c00; color: white; padding: 16px 20px; font-size: 18px; font-weight: 700; }
+.tabs { display: flex; background: white; border-bottom: 2px solid #e65c00; }
+.tab { flex: 1; padding: 12px; text-align: center; font-weight: 700; font-size: 13px; color: #999; cursor: pointer; }
+.tab.on { color: #e65c00; border-bottom: 3px solid #e65c00; margin-bottom: -2px; }
+.page { display: none; padding: 16px; }
+.page.on { display: block; }
+.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.row { display: flex; justify-content: space-between; align-items: center; }
+.nama { font-weight: 700; font-size: 15px; }
+.sub { color: #888; font-size: 13px; margin-top: 2px; }
+.stok-num { font-size: 22px; font-weight: 900; color: #e65c00; }
+.btn-row { display: flex; gap: 8px; margin-top: 10px; }
+button { border: none; border-radius: 8px; padding: 10px 16px; font-weight: 700; cursor: pointer; font-size: 14px; }
+.btn-o { background: #e65c00; color: white; flex: 1; }
+.btn-g { background: #00b894; color: white; flex: 1; }
+.btn-r { background: #d63031; color: white; }
+.btn-gray { background: #eee; color: #333; flex: 1; }
+input, select { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 6px; }
+label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-top: 12px; }
+.total-box { background: #fff3e0; border-radius: 10px; padding: 14px; text-align: center; margin: 12px 0; }
+.total-box .big { font-size: 24px; font-weight: 900; color: #e65c00; }
+.hutang-card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 4px solid #d63031; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.lunas-btn { background: #00b894; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
+.fab { position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px; background: #e65c00; color: white; border-radius: 50%; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(230,92,0,0.4); cursor: pointer; border: none; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10; align-items: flex-end; }
+.overlay.on { display: flex; }
+.sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 24px 20px 32px; }
+.sheet h3 { font-size: 17px; margin-bottom: 4px; }
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 22px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 99; }
+.sum-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.sum-item { background: white; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.sum-item .val { font-size: 17px; font-weight: 900; }
+.sum-item .lbl { font-size: 11px; color: #888; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">🪁 Catatan Layangan</div>
+
+<div class="tabs">
+  <div class="tab on" onclick="showTab('stok',this)">📦 Stok</div>
+  <div class="tab" onclick="showTab('jual',this)">🛒 Jual</div>
+  <div class="tab" onclick="showTab('tagihan',this)">💰 Tagihan</div>
+</div>
+
+<!-- STOK -->
+<div id="pg-stok" class="page on">
+  <div id="list-stok"><div class="empty">Memuat...</div></div>
+</div>
+
+<!-- JUAL -->
+<div id="pg-jual" class="page">
+  <div class="card">
+    <label>Pilih Layangan</label>
+    <select id="j-item"></select>
+    <label>Jumlah</label>
+    <input type="number" id="j-qty" value="1" min="1">
+    <label>Nama (opsional)</label>
+    <input type="text" id="j-nama" placeholder="Nama pembeli / catatan">
+    <div class="total-box" id="j-total-box">
+      <div style="font-size:13px;color:#888">Total tagihan ke teman</div>
+      <div class="big" id="j-total">Rp 0</div>
+    </div>
+    <button class="btn-o" style="width:100%;padding:14px;font-size:16px" onclick="simpanJual()">💾 Simpan</button>
+  </div>
+</div>
+
+<!-- TAGIHAN -->
+<div id="pg-tagihan" class="page">
+  <div class="sum-bar">
+    <div class="sum-item"><div class="val" id="t-total" style="color:#d63031">Rp 0</div><div class="lbl">Belum Dibayar</div></div>
+    <div class="sum-item"><div class="val" id="t-lunas" style="color:#00b894">Rp 0</div><div class="lbl">Sudah Dibayar</div></div>
+  </div>
+  <div id="list-tagihan"><div class="empty">Memuat...</div></div>
+</div>
+
+<!-- FAB tambah layangan -->
+<button class="fab" id="fab" onclick="openSheet()">+</button>
+
+<!-- Sheet tambah layangan -->
+<div class="overlay" id="overlay" onclick="closeSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <h3>➕ Tambah Layangan</h3>
+    <label>Nama Layangan</label>
+    <input type="text" id="s-nama" placeholder="Contoh: Layangan Naga">
+    <label>Harga Modal (Rp)</label>
+    <input type="number" id="s-harga" placeholder="25000">
+    <label>Stok Awal</label>
+    <input type="number" id="s-stok" placeholder="0" value="0">
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn-gray" onclick="closeSheet()">Batal</button>
+      <button class="btn-o" onclick="tambahLayangan()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SURL = "https://xjqkaykrlqtvrbjxgzxm.supabase.co";
+const SKEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqcWtheWtybHF0dnJianhnenhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzg3OTUsImV4cCI6MjA5MTk1NDc5NX0.poSeoWokR5BW7Y_0gmUYEahZ3Cs4Kri_-J5WP1vrT4I";
+let sb, items = [];
+const $ = id => document.getElementById(id);
+const rp = n => "Rp " + Number(n).toLocaleString('id-ID');
+
+function toast(msg) { const t=$('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+
+window.onload = () => {
+  const init = () => {
+    if(window.supabase){ sb = window.supabase.createClient(SURL,SKEY); load(); }
+    else setTimeout(init,100);
   };
-  tryInit();
-};function initManual() {const u = id('sb-url').value || URL;const k = id('sb-key').value || KEY;sb = window.supabase.createClient(u, k);start();}async function start() {id('setup-screen').style.display = 'none';id('app').style.display = 'block';id('fab').style.display = 'flex';id('h-date').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});load();}async function load() {const { data } = await sb.from('layangans').select('*').order('nama');dataL = data || [];renderStok();renderSum();renderJualDrop();const activeTab = document.querySelector('.nav-item.active').innerText.toLowerCase();if(activeTab.includes('jual')) renderHutang();if(activeTab.includes('riwayat')) renderHistory();if(activeTab.includes('laporan')) renderLap();}function renderStok() {id('list-stok').innerHTML = dataL.map(l => `<div class="item"><div><b>${l.nama}</b><br><small>${rp(l.harga)}</small></div><div class="stok-controls"><button class="btn-s btn-minus" onclick="upStok(${l.id},-1)">-</button><b style="width:20px; text-align:center">${l.stok}</b><button class="btn-s btn-plus" onclick="upStok(${l.id},1)">+</button></div></div>`).join('');}async function upStok(i, d) {const item = dataL.find(x => x.id === i);await sb.from('layangans').update({stok: Math.max(0, item.stok + d)}).eq('id', i);load();}async function addLayangan() {const nama = id('in-nama').value;const harga = parseInt(id('in-harga').value);const stok = parseInt(id('in-stok').value);if(!nama||!harga||isNaN(stok)) return;await sb.from('layangans').insert({nama, harga, stok});closeM();id('in-nama').value='';id('in-harga').value='';id('in-stok').value='';load();}function renderJualDrop() {const s = id('j-id');s.innerHTML = '<option value="">Pilih...</option>' + dataL.map(l => `<option value="${l.id}">${l.nama} - ${rp(l.harga)}</option>`).join('');}async function doJual() {const i = id('j-id').value;const q = parseInt(id('j-qty').value);const n = id('j-note').value;const l = dataL.find(x => x.id == i);if(!i || !q || !l) return;if(l.stok < q){msg("Stok tidak cukup!");return;}const total = q * l.harga;await sb.from('transaksis').insert({layangan_id:i, layangan_nama:l.nama, tipe:'jual', qty:q, harga:l.harga, total:total, catatan:n, status:'hutang'});await sb.from('layangans').update({stok: l.stok - q}).eq('id', i);msg("Tersimpan! Tagihan: "+rp(total));id('j-qty').value='1';id('j-note').value='';load();}async function renderHutang() {const { data } = await sb.from('transaksis').select('*').eq('status', 'hutang');id('list-hutang').innerHTML = data?.map(t => `<div class="hutang-box"><div><b>${t.catatan || 'No Name'}</b><br><small>${t.layangan_nama} (${t.qty})</small></div><div style="text-align:right"><b>${rp(t.total)}</b><br><button class="btn-lunas" onclick="bayar(${t.id},${t.total})">Lunas</button></div></div>`).join('') || 'Lunas semua!';}async function bayar(i, t) {await sb.from('transaksis').update({status:'lunas'}).eq('id', i);await sb.from('transaksis').insert({tipe:'bayar', total:t, catatan:'Pelunasan'});load();}async function renderHistory() {const { data } = await sb.from('transaksis').select('*').order('created_at', {ascending:false});id('list-history').innerHTML = data?.map(t => `<div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between"><span>${t.tipe=='jual'?'🛒':'💰'} ${t.layangan_nama || t.catatan}</span><b>${rp(t.total)}</b></div>`).join('');}async function renderLap() {const { data } = await sb.from('transaksis').select('*');const jual = data?.filter(x => x.tipe=='jual').reduce((a,b)=>a+b.total,0) || 0;const masuk = data?.filter(x => x.tipe=='bayar').reduce((a,b)=>a+b.total,0) || 0;id('laporan-box').innerHTML = `<div class="card" style="background:var(--primary); color:white">Omzet: ${rp(jual)}</div><div class="card">Uang Masuk: ${rp(masuk)}<br><span style="color:var(--red)">Sisa Piutang: ${rp(jual-masuk)}</span></div>`;}async function renderSum() {const { data } = await sb.from('transaksis').select('total').eq('status','hutang');id('sum-h').innerText = rp(data?.reduce((a,b)=>a+b.total,0) || 0);id('sum-s').innerText = dataL.reduce((a,b)=>a+b.stok,0);}function tab(t, el) {document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));id('s-'+t).classList.add('active');el.classList.add('active');id('fab').style.display = t === 'stok' ? 'flex' : 'none';load();}function openM() { id('m-add').classList.add('open'); }function closeM() { id('m-add').classList.remove('open'); }function msg(m) { const t=id('tst'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2000); }</script></body></html>
+  init();
+};
+
+async function load() {
+  const {data} = await sb.from('layangans').select('*').order('nama');
+  items = data || [];
+  renderStok();
+  renderJualDrop();
+  renderTagihan();
+}
+
+function renderStok() {
+  if(!items.length){ $('list-stok').innerHTML='<div class="empty">Belum ada layangan.<br>Tap + untuk tambah.</div>'; return; }
+  $('list-stok').innerHTML = items.map(l => `
+    <div class="card">
+      <div class="row">
+        <div><div class="nama">${l.nama}</div><div class="sub">${rp(l.harga)} / buah</div></div>
+        <div class="stok-num">${l.stok}</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-gray" onclick="ubahStok(${l.id},-1)">− Kurang</button>
+        <button class="btn-o" onclick="ubahStok(${l.id},1)">+ Tambah</button>
+        <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:10px 12px">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderJualDrop() {
+  $('j-item').innerHTML = '<option value="">-- Pilih --</option>' +
+    items.map(l=>`<option value="${l.id}" data-harga="${l.harga}">${l.nama} (${rp(l.harga)})</option>`).join('');
+  $('j-item').onchange = hitungTotal;
+  $('j-qty').oninput = hitungTotal;
+}
+
+function hitungTotal() {
+  const opt = $('j-item').selectedOptions[0];
+  const harga = opt ? parseInt(opt.dataset.harga)||0 : 0;
+  const qty = parseInt($('j-qty').value)||0;
+  $('j-total').innerText = rp(harga * qty);
+}
+
+async function simpanJual() {
+  const sel = $('j-item');
+  const id = sel.value;
+  const qty = parseInt($('j-qty').value);
+  const nama = $('j-nama').value || '-';
+  const l = items.find(x=>x.id==id);
+  if(!id||!qty||!l){ toast('Pilih layangan & isi jumlah!'); return; }
+  if(l.stok < qty){ toast('Stok tidak cukup! Stok: '+l.stok); return; }
+  const total = qty * l.harga;
+  await sb.from('transaksis').insert({layangan_id:id, layangan_nama:l.nama, qty, harga:l.harga, total, nama_pembeli:nama, status:'belum'});
+  await sb.from('layangans').update({stok: l.stok - qty}).eq('id', id);
+  toast('✅ Tersimpan! Tagihan: '+rp(total));
+  $('j-qty').value=1; $('j-nama').value=''; sel.value=''; $('j-total').innerText='Rp 0';
+  load();
+}
+
+async function renderTagihan() {
+  const {data} = await sb.from('transaksis').select('*').order('created_at',{ascending:false});
+  const semua = data || [];
+  const belum = semua.filter(x=>x.status=='belum');
+  const sudah = semua.filter(x=>x.status=='lunas');
+  $('t-total').innerText = rp(belum.reduce((a,b)=>a+b.total,0));
+  $('t-lunas').innerText = rp(sudah.reduce((a,b)=>a+b.total,0));
+  if(!semua.length){ $('list-tagihan').innerHTML='<div class="empty">Belum ada transaksi.</div>'; return; }
+  $('list-tagihan').innerHTML = semua.map(t=>`
+    <div class="hutang-card" style="border-left-color:${t.status=='lunas'?'#00b894':'#d63031'}">
+      <div class="row">
+        <div>
+          <div class="nama">${t.nama_pembeli||'-'}</div>
+          <div class="sub">${t.layangan_nama} × ${t.qty} = ${rp(t.total)}</div>
+          <div class="sub" style="font-size:11px;color:#bbb">${new Date(t.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>
+        ${t.status=='belum'
+          ? `<button class="lunas-btn" onclick="tandaiLunas(${t.id})">Lunas</button>`
+          : `<span style="color:#00b894;font-weight:700;font-size:13px">✓ Lunas</span>`}
+      </div>
+    </div>`).join('');
+}
+
+async function tandaiLunas(id) {
+  await sb.from('transaksis').update({status:'lunas'}).eq('id',id);
+  toast('✅ Ditandai lunas!');
+  load();
+}
+
+async function ubahStok(id, delta) {
+  const l = items.find(x=>x.id===id);
+  const baru = Math.max(0, l.stok + delta);
+  await sb.from('layangans').update({stok:baru}).eq('id',id);
+  load();
+}
+
+async function hapusLayangan(id) {
+  if(!confirm('Hapus layangan ini?')) return;
+  await sb.from('layangans').delete().eq('id',id);
+  load();
+}
+
+async function tambahLayangan() {
+  const nama = $('s-nama').value.trim();
+  const harga = parseInt($('s-harga').value);
+  const stok = parseInt($('s-stok').value)||0;
+  if(!nama||!harga){ toast('Isi nama & harga!'); return; }
+  await sb.from('layangans').insert({nama, harga, stok});
+  toast('✅ Layangan ditambah!');
+  closeSheet();
+  $('s-nama').value=''; $('s-harga').value=''; $('s-stok').value='0';
+  load();
+}
+
+function showTab(t, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  $('pg-'+t).classList.add('on');
+  el.classList.add('on');
+  $('fab').style.display = t==='stok' ? 'flex' : 'none';
+  if(t==='tagihan') renderTagihan();
+}
+
+function openSheet() { $('overlay').classList.add('on'); }
+function closeSheet() { $('overlay').classList.remove('on'); }
+</script>
+</body>
+</html>
