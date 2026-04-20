@@ -392,7 +392,13 @@ function toggleLunas() {
 async function bayarSemua() {
   const total = $('t-total').innerText;
   if (!confirm('Tandai semua tagihan (' + total + ') sebagai lunas?')) return;
-  await sb.from('transaksis').update({ status: 'lunas', paid_at: new Date().toISOString() }).eq('status', 'belum');
+  const { error } = await sb.from('transaksis')
+    .update({ status: 'lunas', paid_at: new Date().toISOString() })
+    .eq('status', 'belum');
+  if (error) {
+    alert('❌ ERROR: ' + error.message + '\n\nCode: ' + error.code);
+    return;
+  }
   toast('✅ Semua tagihan lunas!');
   load();
 }
