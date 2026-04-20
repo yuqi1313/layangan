@@ -343,9 +343,20 @@ async function simpanHarga(id) {
 }
 
 async function hapusLayangan(id) {
-  if (!confirm('Hapus layangan ini?')) return;
-  await sb.from('layangans').delete().eq('id', id);
-  load();
+  const l = items.find(x => x.id === id);
+  if (!confirm(`Hapus "${l.nama}"?\n\nSemua transaksi terkait juga akan dihapus.`)) return;
+  
+  // Hapus transaksi dulu
+  await sb.from('transaksis').delete().eq('layangan_id', id);
+  
+  // Baru hapus layangan
+  const { error } = await sb.from('layangans').delete().eq('id', id);
+  if (error) {
+    toast('❌ Gagal hapus: ' + error.message);
+  } else {
+    toast('✅ Layangan dihapus!');
+    load();
+  }
 }
 
 async function tambahLayangan() {
