@@ -309,7 +309,10 @@ async function renderTagihan() {
           ${t.status == 'lunas' && t.paid_at ? `<div class="sub" style="font-size:11px;color:#00b894;margin-top:2px">&#x2714; Dibayar: ${new Date(t.paid_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>` : ''}
         </div>
         ${t.status == 'belum'
-          ? `<button class="lunas-btn" onclick="tandaiLunas(${t.id})">Lunas</button>`
+          ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+               <button class="lunas-btn" onclick="tandaiLunas(${t.id})">Lunas</button>
+               <button onclick="batalTransaksi(${t.id},${t.layangan_id},${t.qty})" style="background:none;border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:11px;color:#999;cursor:pointer;font-weight:700">↩ Batal</button>
+             </div>`
           : `<span style="color:#00b894;font-weight:700;font-size:13px">&#x2713; Lunas</span>`}
       </div>
     </div>`).join('');
@@ -325,6 +328,17 @@ async function bayarSemua() {
   if (!confirm('Tandai semua tagihan (' + total + ') sebagai lunas?')) return;
   await sb.from('transaksis').update({ status: 'lunas', paid_at: new Date().toISOString() }).eq('status', 'belum');
   toast('✅ Semua tagihan lunas!');
+  load();
+}
+
+async function batalTransaksi(id, layangan_id, qty) {
+  if (!confirm('Batalkan transaksi ini?\nStok akan dikembalikan.')) return;
+  // Kembalikan stok
+  const l = items.find(x => x.id === layangan_id);
+  if (l) await sb.from('layangans').update({ stok: l.stok + qty }).eq('id', layangan_id);
+  // Hapus transaksi
+  await sb.from('transaksis').delete().eq('id', id);
+  toast('↩ Transaksi dibatalkan, stok dikembalikan!');
   load();
 }
 
