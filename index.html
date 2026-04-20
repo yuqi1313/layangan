@@ -380,7 +380,7 @@ async function renderTagihan() {
     html += '<div class="empty">Semua tagihan sudah lunas. 🎉</div>';
   }
 
-  // Riwayat lunas dikelompokkan per tanggal bayar
+  // Riwayat lunas dikelompokkan per tanggal bayar (accordion)
   if (showLunas && sudah.length) {
     const groups = {};
     sudah.forEach(t => {
@@ -393,25 +393,34 @@ async function renderTagihan() {
 
     html += '<div style="margin-top:16px;margin-bottom:6px;font-size:12px;color:#aaa;font-weight:700">RIWAYAT LUNAS</div>';
 
-    Object.keys(groups).forEach(tgl => {
+    Object.keys(groups).forEach((tgl, idx) => {
       const totalTgl = groups[tgl].reduce((a, b) => a + b.total, 0);
+      const jumlah = groups[tgl].length;
+      const accordionId = 'acc-' + idx;
       html += `
-        <div style="margin:10px 0 4px;display:flex;align-items:center;gap:8px">
-          <div style="flex:1;height:1px;background:#e0e0e0"></div>
-          <span style="font-size:12px;font-weight:700;color:#00b894;white-space:nowrap">📅 ${tgl} · ${rp(totalTgl)}</span>
-          <div style="flex:1;height:1px;background:#e0e0e0"></div>
-        </div>`;
-      html += groups[tgl].map(t => `
-        <div class="hutang-card" style="border-left-color:#00b894">
-          <div class="row">
+        <div style="background:white;border-radius:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden">
+          <div onclick="toggleAcc('${accordionId}')" style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;border-left:4px solid #00b894">
             <div>
-              <div class="nama">${t.nama_pembeli || '-'}</div>
-              <div class="sub">${t.layangan_nama} &times; ${t.qty} = ${rp(t.total)}</div>
-              <div class="sub" style="font-size:11px;color:#00b894;margin-top:2px">✔ Dibayar: ${tgl}</div>
+              <div style="font-weight:700;font-size:14px;color:#333">📅 ${tgl}</div>
+              <div style="font-size:12px;color:#888;margin-top:2px">${jumlah} transaksi</div>
             </div>
-            <span style="color:#00b894;font-weight:700;font-size:13px">✓ Lunas</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-weight:900;font-size:15px;color:#00b894">${rp(totalTgl)}</div>
+              <span id="arr-${accordionId}" style="font-size:18px;color:#aaa;transition:transform 0.2s">▼</span>
+            </div>
           </div>
-        </div>`).join('');
+          <div id="${accordionId}" style="display:none;border-top:1px solid #f0f0f0">`;
+      html += groups[tgl].map(t => `
+            <div style="padding:11px 16px;border-bottom:1px solid #f5f5f5">
+              <div class="row">
+                <div>
+                  <div class="nama">${t.nama_pembeli || '-'}</div>
+                  <div class="sub">${t.layangan_nama} &times; ${t.qty} = ${rp(t.total)}</div>
+                </div>
+                <span style="color:#00b894;font-weight:700;font-size:13px">✓ Lunas</span>
+              </div>
+            </div>`).join('');
+      html += `</div></div>`;
     });
   }
 
@@ -421,6 +430,14 @@ async function renderTagihan() {
 function toggleLunas() {
   showLunas = !showLunas;
   renderTagihan();
+}
+
+function toggleAcc(id) {
+  const el = document.getElementById(id);
+  const arr = document.getElementById('arr-' + id);
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  arr.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
 async function bayarSemua() {
