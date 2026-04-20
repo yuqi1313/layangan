@@ -202,7 +202,7 @@ async function load() {
   await renderTagihan();
 }
 
-// TAB JUAL — tiap layangan ada tombol − untuk jual 1
+// TAB JUAL
 function renderJual() {
   if (!items.length) {
     $('list-jual').innerHTML = '<div class="empty">Belum ada layangan.</div>';
@@ -228,7 +228,7 @@ function renderJual() {
     </div>`).join('');
 }
 
-// TAB STOK — daftar stok saat ini + tombol hapus
+// TAB STOK
 function renderStokList() {
   if (!items.length) {
     $('list-stok').innerHTML = '<div class="empty">Belum ada layangan.<br>Tap tombol di atas untuk tambah.</div>';
@@ -247,7 +247,6 @@ function renderStokList() {
         <div style="flex:1;min-width:0">
           <div class="nama" id="nama-text-${l.id}">${l.nama}</div>
           <div class="sub" id="harga-text-${l.id}">${rp(l.harga)} / buah</div>
-          <!-- Form edit (tersembunyi) -->
           <div id="edit-form-${l.id}" style="display:none;margin-top:8px">
             <input type="text" id="edit-nama-${l.id}" value="${l.nama}"
               style="padding:7px 10px;font-size:14px;font-weight:700;margin-top:0;margin-bottom:6px;border-radius:8px">
@@ -359,29 +358,64 @@ async function renderTagihan() {
     return;
   }
 
-  const tampil = showLunas ? semua : belum;
-  if (!tampil.length) {
-    $('list-tagihan').innerHTML = '<div class="empty">Semua tagihan sudah lunas. &#x1F389;</div>';
-    return;
+  let html = '';
+
+  // Tagihan belum dibayar
+  if (belum.length) {
+    html += belum.map(t => `
+      <div class="hutang-card" style="border-left-color:#d63031">
+        <div class="row">
+          <div>
+            <div class="nama">${t.nama_pembeli || '-'}</div>
+            <div class="sub">${t.layangan_nama} &times; ${t.qty} = ${rp(t.total)}</div>
+            <div class="sub" style="font-size:11px;color:#bbb">${new Date(t.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <button class="lunas-btn" onclick="tandaiLunas(${t.id})">Lunas</button>
+            <button onclick="batalTransaksi(${t.id},${t.layangan_id},${t.qty})" style="background:none;border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:11px;color:#999;cursor:pointer;font-weight:700">↩ Batal</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } else {
+    html += '<div class="empty">Semua tagihan sudah lunas. 🎉</div>';
   }
 
-  $('list-tagihan').innerHTML = tampil.map(t => `
-    <div class="hutang-card" style="border-left-color:${t.status == 'lunas' ? '#00b894' : '#d63031'}">
-      <div class="row">
-        <div>
-          <div class="nama">${t.nama_pembeli || '-'}</div>
-          <div class="sub">${t.layangan_nama} &times; ${t.qty} = ${rp(t.total)}</div>
-          <div class="sub" style="font-size:11px;color:#bbb">${new Date(t.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-          ${t.status == 'lunas' && t.paid_at ? `<div class="sub" style="font-size:11px;color:#00b894;margin-top:2px">&#x2714; Dibayar: ${new Date(t.paid_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</div>` : ''}
-        </div>
-        ${t.status == 'belum'
-          ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-               <button class="lunas-btn" onclick="tandaiLunas(${t.id})">Lunas</button>
-               <button onclick="batalTransaksi(${t.id},${t.layangan_id},${t.qty})" style="background:none;border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:11px;color:#999;cursor:pointer;font-weight:700">↩ Batal</button>
-             </div>`
-          : `<span style="color:#00b894;font-weight:700;font-size:13px">&#x2713; Lunas</span>`}
-      </div>
-    </div>`).join('');
+  // Riwayat lunas dikelompokkan per tanggal bayar
+  if (showLunas && sudah.length) {
+    const groups = {};
+    sudah.forEach(t => {
+      const tgl = t.paid_at
+        ? new Date(t.paid_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+        : 'Tanggal tidak diketahui';
+      if (!groups[tgl]) groups[tgl] = [];
+      groups[tgl].push(t);
+    });
+
+    html += '<div style="margin-top:16px;margin-bottom:6px;font-size:12px;color:#aaa;font-weight:700">RIWAYAT LUNAS</div>';
+
+    Object.keys(groups).forEach(tgl => {
+      const totalTgl = groups[tgl].reduce((a, b) => a + b.total, 0);
+      html += `
+        <div style="margin:10px 0 4px;display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:1px;background:#e0e0e0"></div>
+          <span style="font-size:12px;font-weight:700;color:#00b894;white-space:nowrap">📅 ${tgl} · ${rp(totalTgl)}</span>
+          <div style="flex:1;height:1px;background:#e0e0e0"></div>
+        </div>`;
+      html += groups[tgl].map(t => `
+        <div class="hutang-card" style="border-left-color:#00b894">
+          <div class="row">
+            <div>
+              <div class="nama">${t.nama_pembeli || '-'}</div>
+              <div class="sub">${t.layangan_nama} &times; ${t.qty} = ${rp(t.total)}</div>
+              <div class="sub" style="font-size:11px;color:#00b894;margin-top:2px">✔ Dibayar: ${tgl}</div>
+            </div>
+            <span style="color:#00b894;font-weight:700;font-size:13px">✓ Lunas</span>
+          </div>
+        </div>`).join('');
+    });
+  }
+
+  $('list-tagihan').innerHTML = html;
 }
 
 function toggleLunas() {
@@ -392,23 +426,16 @@ function toggleLunas() {
 async function bayarSemua() {
   const total = $('t-total').innerText;
   if (!confirm('Tandai semua tagihan (' + total + ') sebagai lunas?')) return;
-  const { error } = await sb.from('transaksis')
-    .update({ status: 'lunas', paid_at: new Date().toISOString() })
-    .eq('status', 'belum');
-  if (error) {
-    alert('❌ ERROR: ' + error.message + '\n\nCode: ' + error.code);
-    return;
-  }
+  const { error } = await sb.from('transaksis').update({ status: 'lunas', paid_at: new Date().toISOString() }).eq('status', 'belum');
+  if (error) { alert('❌ ERROR: ' + error.message); return; }
   toast('✅ Semua tagihan lunas!');
   load();
 }
 
 async function batalTransaksi(id, layangan_id, qty) {
   if (!confirm('Batalkan transaksi ini?\nStok akan dikembalikan.')) return;
-  // Kembalikan stok
   const l = items.find(x => x.id === layangan_id);
   if (l) await sb.from('layangans').update({ stok: l.stok + qty }).eq('id', layangan_id);
-  // Hapus transaksi
   await sb.from('transaksis').delete().eq('id', id);
   toast('↩ Transaksi dibatalkan, stok dikembalikan!');
   load();
@@ -420,15 +447,10 @@ async function tandaiLunas(id) {
   load();
 }
 
-
 async function hapusLayangan(id) {
   const l = items.find(x => x.id === id);
   if (!confirm(`Hapus "${l.nama}"?\n\nSemua transaksi terkait juga akan dihapus.`)) return;
-  
-  // Hapus transaksi dulu
   await sb.from('transaksis').delete().eq('layangan_id', id);
-  
-  // Baru hapus layangan
   const { error } = await sb.from('layangans').delete().eq('id', id);
   if (error) {
     toast('❌ Gagal hapus: ' + error.message);
@@ -444,7 +466,6 @@ async function tambahLayangan() {
   const stok = parseInt($('s-stok').value) || 0;
   if (!nama || !harga) { toast('Isi nama & harga!'); return; }
 
-  // Upload foto jika ada
   let foto_url = null;
   const file = $('s-foto-input').files[0];
   if (file) {
@@ -471,7 +492,6 @@ async function tambahLayangan() {
 }
 
 async function gantiPhoto(id) {
-  // Buat input file sementara
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
