@@ -13,11 +13,8 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
 body { background: #f0f0f0; max-width: 480px; margin: 0 auto; min-height: 100vh; }
-.topbar { position: sticky; top: 0; z-index: 40; background: #e65c00; color: white; padding: 20px 20px; font-size: 22px; font-weight: 700; box-shadow: 0 2px 8px rgba(230,92,0,0.3); }
-.tabs { display: flex; background: white; border-bottom: 2px solid #e65c00; }
-.tab { flex: 1; padding: 12px; text-align: center; font-weight: 700; font-size: 13px; color: #999; cursor: pointer; }
-.tab.on { color: #e65c00; border-bottom: 3px solid #e65c00; margin-bottom: -2px; }
-.page { display: none; padding: 16px; padding-bottom: 100px; }
+.topbar { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 40; background: #e65c00; color: white; padding: 18px 20px; font-size: 20px; font-weight: 700; box-shadow: 0 2px 8px rgba(230,92,0,0.3); }
+.page { display: none; padding: 16px; padding-top: 72px; padding-bottom: 90px; }
 .page.on { display: block; }
 .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 .nama { font-weight: 700; font-size: 15px; }
@@ -36,19 +33,18 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 .hutang-card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 4px solid #d63031; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .lunas-btn { background: #00b894; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; }
 .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
-.fab { position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px; background: #e65c00; color: white; border-radius: 50%; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(230,92,0,0.4); cursor: pointer; border: none; }
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10; align-items: center; justify-content: center; padding: 20px; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 60; align-items: center; justify-content: center; padding: 20px; }
 .overlay.on { display: flex; }
 .sheet { background: white; width: 100%; max-width: 440px; border-radius: 20px; padding: 24px 20px 28px; max-height: 85vh; overflow-y: auto; }
 .sheet h3 { font-size: 17px; margin-bottom: 4px; }
 .btn-row { display: flex; gap: 8px; margin-top: 16px; }
-.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 22px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 99; }
+.toast { position: fixed; top: 76px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 22px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 99; white-space: nowrap; }
 .sum-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .sum-item { background: white; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .sum-item .val { font-size: 17px; font-weight: 900; }
 .sum-item .lbl { font-size: 11px; color: #888; margin-top: 2px; }
 .stok-form { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-.install-banner { display:none; position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:white; border-top:3px solid #e65c00; padding:14px 20px; z-index:50; box-shadow:0 -4px 16px rgba(0,0,0,0.12); align-items:center; gap:12px; }
+.install-banner { display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-width:448px; background:white; border-radius:16px; padding:14px 20px; z-index:50; box-shadow:0 4px 16px rgba(0,0,0,0.15); align-items:center; gap:12px; }
 .install-banner.on { display:flex; }
 .install-banner .ib-text { flex:1; font-size:13px; color:#333; }
 .install-banner .ib-text b { display:block; font-size:14px; margin-bottom:2px; }
@@ -60,11 +56,11 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 .lightbox .lb-nama { color:white; font-size:20px; font-weight:900; margin-top:20px; text-align:center; }
 .lightbox .lb-harga { color:#f9a825; font-size:15px; margin-top:6px; }
 .lightbox .lb-close { position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.15); border:none; color:white; font-size:24px; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; display: flex; padding: 8px 16px 20px; gap: 8px; box-shadow: 0 -1px 0 rgba(0,0,0,0.08), 0 -4px 20px rgba(0,0,0,0.08); z-index: 50; }
-.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 8px; border-radius: 16px; cursor: pointer; transition: all 0.2s; color: #bbb; font-size: 11px; font-weight: 600; }
-.nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
-.nav-item.on { background: #fff3e0; color: #e65c00; }
-.nav-item.on .nav-icon { transform: scale(1.15); }
+.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; display: flex; padding: 10px 12px 24px; box-shadow: 0 -1px 0 #eee; z-index: 50; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; border-radius: 14px; cursor: pointer; color: #ccc; font-size: 11px; font-weight: 600; transition: all 0.18s; }
+.nav-item .nav-icon { font-size: 26px; line-height: 1; transition: transform 0.18s; }
+.nav-item.on { color: white; background: #e65c00; border-radius: 14px; }
+.nav-item.on .nav-icon { transform: translateY(-2px) scale(1.15); filter: drop-shadow(0 2px 4px rgba(230,92,0,0.4)); }
 </style>
 </head>
 <body>
