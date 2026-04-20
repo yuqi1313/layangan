@@ -157,6 +157,11 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 <script>
 const SURL = "https://xjqkaykrlqtvrbjxgzxm.supabase.co";
 const SKEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqcWtheWtybHF0dnJianhnenhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzg3OTUsImV4cCI6MjA5MTk1NDc5NX0.poSeoWokR5BW7Y_0gmUYEahZ3Cs4Kri_-J5WP1vrT4I";
+
+// === KONFIGURASI NOTIF TELEGRAM (isi sendiri, jangan share ke siapapun) ===
+const TG_TOKEN = "8645708862:AAEqRs_CknBSQ0QYkTstG5o_gYlyiPaU194";   // dari @BotFather
+const TG_CHAT_ID = "5370804782";   // Chat ID HP kamu
+// =========================================================================
 let sb, items = [];
 let uploadedPhotoUrl = null;
 const $ = id => document.getElementById(id);
@@ -266,11 +271,22 @@ async function tambahStok() {
   load();
 }
 
+async function kirimNotif(nama, harga, stokSisa) {
+  if (!TG_TOKEN || TG_TOKEN.includes('ISI_')) return;
+  const msg = `🪁 Layangan Terjual!\n\n📦 ${nama}\n💰 ${rp(harga)}\n📉 Sisa stok: ${stokSisa}`;
+  fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg })
+  });
+}
+
 async function jualSatu(id) {
   const l = items.find(x => x.id === id);
   if (!l || l.stok < 1) { toast('Stok habis!'); return; }
   await sb.from('transaksis').insert({ layangan_id: id, layangan_nama: l.nama, qty: 1, harga: l.harga, total: l.harga, nama_pembeli: '-', status: 'belum' });
   await sb.from('layangans').update({ stok: l.stok - 1 }).eq('id', id);
+  kirimNotif(l.nama, l.harga, l.stok - 1);
   toast('🛒 Terjual 1 ' + l.nama + ' — ' + rp(l.harga));
   load();
 }
