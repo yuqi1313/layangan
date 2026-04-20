@@ -17,7 +17,7 @@ body { background: #f0f0f0; max-width: 480px; margin: 0 auto; min-height: 100vh;
 .tabs { display: flex; background: white; border-bottom: 2px solid #e65c00; }
 .tab { flex: 1; padding: 12px; text-align: center; font-weight: 700; font-size: 13px; color: #999; cursor: pointer; }
 .tab.on { color: #e65c00; border-bottom: 3px solid #e65c00; margin-bottom: -2px; }
-.page { display: none; padding: 16px; padding-bottom: 120px; }
+.page { display: none; padding: 16px; padding-bottom: 100px; }
 .page.on { display: block; }
 .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 .nama { font-weight: 700; font-size: 15px; }
@@ -60,9 +60,11 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 .lightbox .lb-nama { color:white; font-size:20px; font-weight:900; margin-top:20px; text-align:center; }
 .lightbox .lb-harga { color:#f9a825; font-size:15px; margin-top:6px; }
 .lightbox .lb-close { position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.15); border:none; color:white; font-size:24px; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; background: white; border-radius: 50px; padding: 16px 40px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 50; width: 90%; max-width: 480px; justify-content: center; }
-.nav-item { padding: 14px 24px; border-radius: 50px; font-weight: 700; cursor: pointer; background: #f0f0f0; color: #333; font-size: 15px; transition: all 0.3s; }
-.nav-item.on { background: #e65c00; color: white; box-shadow: 0 4px 12px rgba(230,92,0,0.5); font-size: 16px; font-weight: 900; }
+.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; display: flex; padding: 8px 16px 20px; gap: 8px; box-shadow: 0 -1px 0 rgba(0,0,0,0.08), 0 -4px 20px rgba(0,0,0,0.08); z-index: 50; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 8px; border-radius: 16px; cursor: pointer; transition: all 0.2s; color: #bbb; font-size: 11px; font-weight: 600; }
+.nav-item .nav-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+.nav-item.on { background: #fff3e0; color: #e65c00; }
+.nav-item.on .nav-icon { transform: scale(1.15); }
 </style>
 </head>
 <body>
@@ -70,9 +72,15 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 <div class="topbar">&#x1FA81; Catatan Layangan</div>
 
 <div class="bottom-nav">
-  <div class="nav-item on" onclick="showTab('jual',this)">🛒 Jual</div>
-  <div class="nav-item" onclick="showTab('stok',this)">📦 Stok</div>
-  <div class="nav-item" onclick="showTab('tagihan',this)">💰 Tagihan</div>
+  <div class="nav-item on" onclick="showTab('jual',this)">
+    <span class="nav-icon">🛒</span>Jual
+  </div>
+  <div class="nav-item" onclick="showTab('stok',this)">
+    <span class="nav-icon">📦</span>Stok
+  </div>
+  <div class="nav-item" onclick="showTab('tagihan',this)">
+    <span class="nav-icon">💰</span>Tagihan
+  </div>
 </div>
 
 <!-- JUAL -->
