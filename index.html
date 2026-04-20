@@ -229,7 +229,7 @@ function renderStokList() {
   }
   $('list-stok').innerHTML = '<div style="font-size:12px;color:#aaa;margin-bottom:8px;font-weight:700">STOK SAAT INI</div>' +
     items.map(l => `
-    <div class="card" style="padding:12px 16px">
+    <div class="card" style="padding:12px 16px" id="stok-card-${l.id}">
       <div class="row" style="align-items:flex-start;gap:10px">
         <div style="cursor:pointer;flex-shrink:0" onclick="gantiPhoto(${l.id})" title="Tap untuk ganti foto">
           ${l.foto_url
@@ -238,20 +238,53 @@ function renderStokList() {
           <div style="font-size:10px;color:#e65c00;text-align:center;margin-top:3px;font-weight:700">Ganti</div>
         </div>
         <div style="flex:1;min-width:0">
-          <div class="nama">${l.nama}</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
-            <span style="font-size:12px;color:#888">Rp</span>
-            <input type="number" id="harga-${l.id}" value="${l.harga}" min="0"
-              style="width:110px;padding:6px 8px;font-size:14px;font-weight:700;margin-top:0;border-radius:8px">
-            <button onclick="simpanHarga(${l.id})" style="background:#e65c00;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Simpan</button>
+          <div class="nama" id="nama-text-${l.id}">${l.nama}</div>
+          <div class="sub" id="harga-text-${l.id}">${rp(l.harga)} / buah</div>
+          <!-- Form edit (tersembunyi) -->
+          <div id="edit-form-${l.id}" style="display:none;margin-top:8px">
+            <input type="text" id="edit-nama-${l.id}" value="${l.nama}"
+              style="padding:7px 10px;font-size:14px;font-weight:700;margin-top:0;margin-bottom:6px;border-radius:8px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:12px;color:#888;white-space:nowrap">Rp</span>
+              <input type="number" id="edit-harga-${l.id}" value="${l.harga}" min="0"
+                style="padding:7px 10px;font-size:14px;font-weight:700;margin-top:0;border-radius:8px">
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button onclick="simpanEdit(${l.id})" style="flex:1;background:#e65c00;color:white;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer">&#x2705; Simpan</button>
+              <button onclick="batalEdit(${l.id})" style="flex:1;background:#eee;color:#333;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer">Batal</button>
+            </div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
           <div class="stok-num">${l.stok}</div>
-          <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:8px 10px;font-size:13px">&#x1F5D1;</button>
+          <button onclick="bukaEdit(${l.id})" id="edit-btn-${l.id}" style="background:#f0f0f0;color:#555;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer">&#x270F;&#xFE0F; Edit</button>
+          <button class="btn-r" onclick="hapusLayangan(${l.id})" style="padding:6px 10px;font-size:12px">&#x1F5D1;</button>
         </div>
       </div>
     </div>`).join('');
+}
+
+function bukaEdit(id) {
+  $(`edit-form-${id}`).style.display = 'block';
+  $(`edit-btn-${id}`).style.display = 'none';
+  $(`nama-text-${id}`).style.display = 'none';
+  $(`harga-text-${id}`).style.display = 'none';
+}
+
+function batalEdit(id) {
+  $(`edit-form-${id}`).style.display = 'none';
+  $(`edit-btn-${id}`).style.display = 'block';
+  $(`nama-text-${id}`).style.display = 'block';
+  $(`harga-text-${id}`).style.display = 'block';
+}
+
+async function simpanEdit(id) {
+  const nama = document.getElementById(`edit-nama-${id}`).value.trim();
+  const harga = parseInt(document.getElementById(`edit-harga-${id}`).value);
+  if (!nama || isNaN(harga) || harga < 0) { toast('Data tidak valid!'); return; }
+  await sb.from('layangans').update({ nama, harga }).eq('id', id);
+  toast('✅ Disimpan!');
+  load();
 }
 
 function renderStokDrop() {
@@ -364,13 +397,6 @@ async function tandaiLunas(id) {
   load();
 }
 
-async function simpanHarga(id) {
-  const val = parseInt(document.getElementById('harga-' + id).value);
-  if (isNaN(val) || val < 0) { toast('Harga tidak valid!'); return; }
-  await sb.from('layangans').update({ harga: val }).eq('id', id);
-  toast('✅ Harga diperbarui!');
-  load();
-}
 
 async function hapusLayangan(id) {
   const l = items.find(x => x.id === id);
