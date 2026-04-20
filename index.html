@@ -37,9 +37,9 @@ label { font-size: 13px; font-weight: 700; color: #555; display: block; margin-t
 .lunas-btn { background: #00b894; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0; }
 .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 15px; }
 .fab { position: fixed; bottom: 24px; right: 24px; width: 54px; height: 54px; background: #e65c00; color: white; border-radius: 50%; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(230,92,0,0.4); cursor: pointer; border: none; }
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10; align-items: flex-end; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10; align-items: center; justify-content: center; padding: 20px; }
 .overlay.on { display: flex; }
-.sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 24px 20px 32px; }
+.sheet { background: white; width: 100%; max-width: 440px; border-radius: 20px; padding: 24px 20px 28px; max-height: 85vh; overflow-y: auto; }
 .sheet h3 { font-size: 17px; margin-bottom: 4px; }
 .btn-row { display: flex; gap: 8px; margin-top: 16px; }
 .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 22px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 99; }
